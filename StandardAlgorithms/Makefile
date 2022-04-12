@@ -85,3 +85,38 @@ all-preport: all-files
 all-preport-clean:
 	$(MAKE) -f $(ALLMAKE) preport-clean
 
+# Plugin section
+
+ifndef FRAMAC_SHARE
+FRAMAC_SHARE  :=$(shell frama-c-config -print-share-path)
+endif
+ifndef FRAMAC_LIBDIR
+FRAMAC_LIBDIR :=$(shell frama-c-config -print-libpath)
+endif
+
+PLUGIN_ENABLE:=yes
+PLUGIN_DYNAMIC:=yes
+PLUGIN_DISTRIBUTED:=$(PLUGIN_ENABLE)
+PLUGIN_DEPENDENCIES:= WP
+
+PLUGIN_NAME := ACSL_by_Example
+
+PLUGIN_CMO := ACSL_by_Example_options \
+	ACSL_by_Example_core \
+	ACSL_by_Example_register
+
+PLUGIN_TESTS_DIRS := test
+
+include $(FRAMAC_SHARE)/Makefile.dynamic
+
+install::
+	$(PRINT_INSTALL) ACSL_by_Example share files
+	$(MKDIR) $(FRAMAC_DATADIR)/ACSL-by-Example
+	$(CP) $(ACSL_by_Example_DIR)/Logic/*.acsl $(FRAMAC_DATADIR)/ACSL-by-Example
+	$(CP) $(ACSL_by_Example_DIR)/typedefs.h $(FRAMAC_DATADIR)/ACSL-by-Example
+	$(CP) $(ACSL_by_Example_DIR)/size_type_pair.h $(FRAMAC_DATADIR)/ACSL-by-Example
+	$(CP) $(ACSL_by_Example_DIR)/stack.h $(FRAMAC_DATADIR)/ACSL-by-Example
+
+uninstall::
+	$(PRINT_RM) ACSL_by_Example share files
+	$(RM) -r $(FRAMAC_DATADIR)/ACSL-by-Example
